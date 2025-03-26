@@ -15,6 +15,7 @@
 #endif
 
 #include "php.h"
+#include "php_ini_builder.h"
 
 #include "ext/standard/info.h"
 #include "ext/standard/php_var.h"

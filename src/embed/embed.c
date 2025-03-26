@@ -28,3 +28,9 @@ void ext_php_rs_sapi_startup() {
 
   zend_signal_startup();
 }
+
+void ext_php_rs_sapi_shutdown() {
+  #ifdef ZTS
+   	tsrm_shutdown();
+  #endif
+}

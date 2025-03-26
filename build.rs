@@ -20,7 +20,7 @@ use bindgen::RustTarget;
 use impl_::Provider;
 
 const MIN_PHP_API_VER: u32 = 20200930;
-const MAX_PHP_API_VER: u32 = 20240924;
+const MAX_PHP_API_VER: u32 = 20240925;
 
 /// Provides information about the PHP installation.
 pub trait PHPProvider<'a>: Sized {
@@ -162,7 +162,6 @@ fn build_wrapper(defines: &[(&str, &str)], includes: &[PathBuf]) -> Result<()> {
     Ok(())
 }
 
-#[cfg(feature = "embed")]
 /// Builds the embed library.
 fn build_embed(defines: &[(&str, &str)], includes: &[PathBuf]) -> Result<()> {
     let mut build = cc::Build::new();
@@ -179,14 +178,8 @@ fn build_embed(defines: &[(&str, &str)], includes: &[PathBuf]) -> Result<()> {
 
 /// Generates bindings to the Zend API.
 fn generate_bindings(defines: &[(&str, &str)], includes: &[PathBuf]) -> Result<String> {
-    let mut bindgen = bindgen::Builder::default();
-
-    #[cfg(feature = "embed")]
-    {
-        bindgen = bindgen.header("src/embed/embed.h");
-    }
-
-    bindgen = bindgen
+    let mut bindgen = bindgen::Builder::default()
+        .header("src/embed/embed.h")
         .header("src/wrapper.h")
         .clang_args(
             includes
@@ -322,8 +315,6 @@ fn main() -> Result<()> {
 
     check_php_version(&info)?;
     build_wrapper(&defines, &includes)?;
-
-    #[cfg(feature = "embed")]
     build_embed(&defines, &includes)?;
 
     let bindings = generate_bindings(&defines, &includes)?;

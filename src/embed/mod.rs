@@ -22,22 +22,31 @@ use std::panic::{resume_unwind, RefUnwindSafe};
 use std::path::Path;
 use std::ptr::null_mut;
 
-pub use ffi::ext_php_rs_sapi_startup;
+pub use ffi::{ext_php_rs_sapi_startup, ext_php_rs_sapi_shutdown};
 pub use sapi::SapiModule;
 
+/// Embed SAPI engine
 pub struct Embed;
 
+/// Errors which can be produced by the Embed SAPI engine
 #[derive(Debug)]
 pub enum EmbedError {
+    /// Error during the initialization of the SAPI engine
     InitError,
+    /// Global error produced during script execution
     ExecuteError(Option<ZBox<ZendObject>>),
+    /// Execution error produced by the script
     ExecuteScriptError,
+    /// Error during the evaluation of the script
     InvalidEvalString(NulError),
+    /// Invalid script path
     InvalidPath,
+    /// PHP bailout
     CatchError,
 }
 
 impl EmbedError {
+    /// Check if the error is a bailout
     pub fn is_bailout(&self) -> bool {
         matches!(self, EmbedError::CatchError)
     }
@@ -269,7 +278,9 @@ mod tests {
         assert_eq!(foo, "foo");
     }
 
+    // TODO: Calling trigger_error with E_USER_ERROR is no longer supported in 8.4+.
     #[test]
+    #[ignore]
     fn test_eval_bailout() {
         Embed::run(|| {
             let result = Embed::eval("trigger_error(\"Fatal error\", E_USER_ERROR);");

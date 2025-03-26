@@ -299,6 +299,7 @@ bind! {
     zend_atomic_bool_store,
     zend_interrupt_function,
     zend_eval_string,
+    zend_eval_string_ex,
     zend_file_handle,
     zend_stream_init_filename,
     zend_destroy_file_handle,
@@ -311,5 +312,10 @@ bind! {
     php_module_shutdown,
     php_request_startup,
     php_request_shutdown,
-    instanceof_function_slow
+    instanceof_function_slow,
+    php_ini_builder,
+    php_ini_builder_prepend,
+    php_ini_builder_unquoted,
+    php_ini_builder_quoted,
+    php_ini_builder_define
 }

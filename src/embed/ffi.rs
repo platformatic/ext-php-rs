@@ -15,4 +15,5 @@ extern "C" {
     ) -> *mut c_void;
 
     pub fn ext_php_rs_sapi_startup();
+    pub fn ext_php_rs_sapi_shutdown();
 }

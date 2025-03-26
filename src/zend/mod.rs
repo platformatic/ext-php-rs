@@ -29,12 +29,14 @@ pub use globals::FileGlobals;
 pub use globals::ProcessGlobals;
 pub use globals::SapiGlobals;
 pub use globals::SapiModule;
+pub use globals::SapiHeader;
+pub use globals::SapiHeaders;
+pub use globals::SapiRequestInfo;
 pub use handlers::ZendObjectHandlers;
 pub use ini_entry_def::IniEntryDef;
 pub use linked_list::ZendLinkedList;
 pub use module::ModuleEntry;
 pub use streams::*;
-#[cfg(feature = "embed")]
 pub(crate) use try_catch::panic_wrapper;
 pub use try_catch::{bailout, try_catch, try_catch_first};
 
