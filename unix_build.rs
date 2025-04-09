@@ -58,6 +58,7 @@ impl<'a> PHPProvider<'a> for Provider<'a> {
         let mut defines = vec![];
         if self.info.thread_safety()? {
             defines.push(("ZTS", "1"));
+            // defines.push(("ZEND_ENABLE_STATIC_TSRMLS_CACHE", "1"));
         }
         Ok(defines)
     }

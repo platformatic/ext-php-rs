@@ -99,3 +99,59 @@ bool ext_php_rs_zend_first_try_catch(void* (*callback)(void *), void *ctx, void 
 void ext_php_rs_zend_bailout() {
   zend_bailout();
 }
+
+#include <sapi/embed/php_embed.h>
+
+// We actually use the PHP embed API to run PHP code in test
+// At some point we might want to use our own SAPI to do that
+SAPI_API void* ext_php_rs_embed_callback(int argc, char** argv, void* (*callback)(void *), void *ctx) {
+  void *result = NULL;
+
+  PHP_EMBED_START_BLOCK(argc, argv)
+
+  result = callback(ctx);
+
+  PHP_EMBED_END_BLOCK()
+
+  return result;
+}
+
+SAPI_API void ext_php_rs_sapi_startup() {
+  #if defined(SIGPIPE) && defined(SIG_IGN)
+    signal(SIGPIPE, SIG_IGN);
+  #endif
+
+  #ifdef ZTS
+    php_tsrm_startup();
+    // php_tsrm_startup_ex(4);
+    #ifdef PHP_WIN32
+      ZEND_TSRMLS_CACHE_UPDATE();
+    #endif
+  #endif
+
+  zend_signal_startup();
+}
+
+SAPI_API void ext_php_rs_sapi_shutdown() {
+  #ifdef ZTS
+   	tsrm_shutdown();
+  #endif
+}
+
+SAPI_API void ext_php_rs_sapi_per_thread_init() {
+  #ifdef ZTS
+    (void)ts_resource(0);
+    #ifdef PHP_WIN32
+      ZEND_TSRMLS_CACHE_UPDATE();
+    #endif
+  #endif
+}
+
+SAPI_API void ext_php_rs_sapi_check_sg() {
+  const char* request_method = SG(request_info).request_method;
+  if (request_method == NULL) {
+    printf("SG(request_info).request_method: NULL\n");
+  } else {
+    printf("SG(request_info).request_method: \"%s\"\n", request_method);
+  }
+}

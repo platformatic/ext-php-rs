@@ -5,11 +5,9 @@
 //! version You should only use this crate for test purpose, it's not production
 //! ready
 
-mod ffi;
 mod sapi;
 
 use crate::boxed::ZBox;
-use crate::embed::ffi::ext_php_rs_embed_callback;
 use crate::ffi::{
     _zend_file_handle__bindgen_ty_1, php_execute_script, zend_eval_string, zend_file_handle,
     zend_stream_init_filename, ZEND_RESULT_CODE_SUCCESS,
@@ -22,7 +20,13 @@ use std::panic::{resume_unwind, RefUnwindSafe};
 use std::path::Path;
 use std::ptr::null_mut;
 
-pub use ffi::{ext_php_rs_sapi_startup, ext_php_rs_sapi_shutdown};
+pub use crate::ffi::{
+    ext_php_rs_embed_callback,
+    ext_php_rs_sapi_startup,
+    ext_php_rs_sapi_shutdown,
+    ext_php_rs_sapi_per_thread_init,
+    ext_php_rs_sapi_check_sg
+};
 pub use sapi::SapiModule;
 
 /// Embed SAPI engine

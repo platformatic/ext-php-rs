@@ -317,5 +317,8 @@ bind! {
     php_ini_builder_prepend,
     php_ini_builder_unquoted,
     php_ini_builder_quoted,
-    php_ini_builder_define
+    php_ini_builder_define,
+    SAPI_OPTION_NO_CHDIR,
+    php_default_treat_data,
+    php_default_input_filter
 }

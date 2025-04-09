@@ -1,4 +1,4 @@
-use crate::ffi::{sapi_header_struct, uid_t, gid_t};
+use crate::ffi::{sapi_header_struct, uid_t, gid_t, php_default_treat_data, php_default_input_filter};
 use crate::types::Zval;
 use crate::{embed::SapiModule, error::Result};
 
@@ -69,7 +69,8 @@ impl SapiBuilder {
                 terminate_process: None,
                 php_ini_path_override: ptr::null_mut(),
                 default_post_reader: None,
-                treat_data: None,
+                treat_data: Some(php_default_treat_data),
+                // treat_data: None,
                 executable_location: ptr::null_mut(),
                 php_ini_ignore: 0,
                 php_ini_ignore_cwd: 0,
@@ -77,7 +78,8 @@ impl SapiBuilder {
                 force_http_10: None,
                 get_target_uid: None,
                 get_target_gid: None,
-                input_filter: None,
+                input_filter: Some(php_default_input_filter),
+                // input_filter: None,
                 ini_defaults: None,
                 phpinfo_as_text: 0,
                 ini_entries: ptr::null_mut(),
