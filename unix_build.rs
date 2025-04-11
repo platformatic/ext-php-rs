@@ -4,9 +4,11 @@ use anyhow::{bail, Context, Result};
 
 use crate::{find_executable, path_from_env, PHPInfo, PHPProvider};
 
-pub struct Provider {}
+pub struct Provider<'a> {
+    info: &'a PHPInfo,
+}
 
-impl Provider {
+impl<'a> Provider<'a> {
     /// Runs `php-config` with one argument, returning the stdout.
     fn php_config(&self, arg: &str) -> Result<String> {
         let cmd = Command::new(self.find_bin()?)
@@ -38,9 +40,9 @@ impl Provider {
     }
 }
 
-impl<'a> PHPProvider<'a> for Provider {
-    fn new(_: &'a PHPInfo) -> Result<Self> {
-        Ok(Self {})
+impl<'a> PHPProvider<'a> for Provider<'a> {
+    fn new(info: &'a PHPInfo) -> Result<Self> {
+        Ok(Self { info })
     }
 
     fn get_includes(&self) -> Result<Vec<PathBuf>> {
@@ -53,11 +55,15 @@ impl<'a> PHPProvider<'a> for Provider {
     }
 
     fn get_defines(&self) -> Result<Vec<(&'static str, &'static str)>> {
-        Ok(vec![])
+        let mut defines = vec![];
+        if self.info.thread_safety()? {
+            defines.push(("ZTS", "1"));
+            // defines.push(("ZEND_ENABLE_STATIC_TSRMLS_CACHE", "1"));
+        }
+        Ok(defines)
     }
 
     fn print_extra_link_args(&self) -> Result<()> {
-        #[cfg(feature = "embed")]
         println!("cargo:rustc-link-lib=php");
 
         Ok(())

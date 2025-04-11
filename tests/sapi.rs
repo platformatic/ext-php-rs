@@ -1,5 +1,6 @@
+#![allow(missing_docs)]
+
 #![cfg_attr(windows, feature(abi_vectorcall))]
-#![cfg(feature = "embed")]
 extern crate ext_php_rs;
 
 use ext_php_rs::builders::SapiBuilder;

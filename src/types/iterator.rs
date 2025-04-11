@@ -183,7 +183,6 @@ impl<'a> FromZvalMut<'a> for &'a mut ZendIterator {
 }
 
 #[cfg(test)]
-#[cfg(feature = "embed")]
 mod tests {
     use crate::embed::Embed;
 

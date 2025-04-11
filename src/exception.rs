@@ -89,6 +89,12 @@ impl PhpException {
     }
 }
 
+impl From<PhpException> for String {
+    fn from(ex: PhpException) -> Self {
+        ex.message
+    }
+}
+
 impl From<String> for PhpException {
     fn from(str: String) -> Self {
         Self::default(str)

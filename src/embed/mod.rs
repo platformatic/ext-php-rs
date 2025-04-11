@@ -5,11 +5,9 @@
 //! version You should only use this crate for test purpose, it's not production
 //! ready
 
-mod ffi;
 mod sapi;
 
 use crate::boxed::ZBox;
-use crate::embed::ffi::ext_php_rs_embed_callback;
 use crate::ffi::{
     _zend_file_handle__bindgen_ty_1, php_execute_script, zend_eval_string, zend_file_handle,
     zend_stream_init_filename, ZEND_RESULT_CODE_SUCCESS,
@@ -22,22 +20,37 @@ use std::panic::{resume_unwind, RefUnwindSafe};
 use std::path::Path;
 use std::ptr::null_mut;
 
-pub use ffi::ext_php_rs_sapi_startup;
+pub use crate::ffi::{
+    ext_php_rs_embed_callback,
+    ext_php_rs_sapi_startup,
+    ext_php_rs_sapi_shutdown,
+    ext_php_rs_sapi_per_thread_init,
+    ext_php_rs_sapi_check_sg
+};
 pub use sapi::SapiModule;
 
+/// Embed SAPI engine
 pub struct Embed;
 
+/// Errors which can be produced by the Embed SAPI engine
 #[derive(Debug)]
 pub enum EmbedError {
+    /// Error during the initialization of the SAPI engine
     InitError,
+    /// Global error produced during script execution
     ExecuteError(Option<ZBox<ZendObject>>),
+    /// Execution error produced by the script
     ExecuteScriptError,
+    /// Error during the evaluation of the script
     InvalidEvalString(NulError),
+    /// Invalid script path
     InvalidPath,
+    /// PHP bailout
     CatchError,
 }
 
 impl EmbedError {
+    /// Check if the error is a bailout
     pub fn is_bailout(&self) -> bool {
         matches!(self, EmbedError::CatchError)
     }
@@ -269,7 +282,9 @@ mod tests {
         assert_eq!(foo, "foo");
     }
 
+    // TODO: Calling trigger_error with E_USER_ERROR is no longer supported in 8.4+.
     #[test]
+    #[ignore]
     fn test_eval_bailout() {
         Embed::run(|| {
             let result = Embed::eval("trigger_error(\"Fatal error\", E_USER_ERROR);");

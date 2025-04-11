@@ -15,6 +15,7 @@
 #endif
 
 #include "php.h"
+#include "php_ini_builder.h"
 
 #include "ext/standard/info.h"
 #include "ext/standard/php_var.h"
@@ -25,6 +26,10 @@
 #include "php_variables.h"
 #include "zend_ini.h"
 #include "main/SAPI.h"
+
+#ifdef ZTS
+#include "TSRM.h"
+#endif
 
 zend_string *ext_php_rs_zend_string_init(const char *str, size_t len, bool persistent);
 void ext_php_rs_zend_string_release(zend_string *zs);
@@ -42,3 +47,16 @@ sapi_module_struct *ext_php_rs_sapi_module();
 bool ext_php_rs_zend_try_catch(void* (*callback)(void *), void *ctx, void **result);
 bool ext_php_rs_zend_first_try_catch(void* (*callback)(void *), void *ctx, void **result);
 void ext_php_rs_zend_bailout();
+
+#include "zend.h"
+#include "sapi/embed/php_embed.h"
+
+#if defined(ZTS) && defined(PHP_WIN32)
+ZEND_TSRMLS_CACHE_DEFINE()
+#endif
+
+SAPI_API void* ext_php_rs_embed_callback(int argc, char** argv, void* (*callback)(void *), void *ctx);
+SAPI_API void ext_php_rs_sapi_startup();
+SAPI_API void ext_php_rs_sapi_shutdown();
+SAPI_API void ext_php_rs_sapi_per_thread_init();
+SAPI_API void ext_php_rs_sapi_check_sg();

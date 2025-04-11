@@ -10,3 +10,6 @@ ext-php-rs = { path = "../", features = ["closure"] }
 
 [lib]
 crate-type = ["cdylib"]
+
+[lints.rust]
+missing_docs = "allow"

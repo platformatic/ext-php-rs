@@ -35,9 +35,6 @@ use super::linked_list::ZendLinkedListIterator;
 /// Stores global variables used in the PHP executor.
 pub type ExecutorGlobals = _zend_executor_globals;
 
-/// Stores the SAPI module used in the PHP executor.
-pub type SapiModule = _sapi_module_struct;
-
 impl ExecutorGlobals {
     /// Returns a reference to the PHP executor globals.
     ///
@@ -184,6 +181,9 @@ impl ExecutorGlobals {
         }
     }
 }
+
+/// Stores the SAPI module used in the PHP executor.
+pub type SapiModule = _sapi_module_struct;
 
 impl SapiModule {
     /// Returns a reference to the PHP SAPI module.
@@ -387,6 +387,7 @@ impl SapiGlobals {
     }
 }
 
+/// Stores the SAPI headers.
 pub type SapiHeaders = sapi_headers_struct;
 
 impl<'a> SapiHeaders {
@@ -396,6 +397,7 @@ impl<'a> SapiHeaders {
     }
 }
 
+/// Stores a single header in the SAPI headers.
 pub type SapiHeader = sapi_header_struct;
 
 impl<'a> SapiHeader {
@@ -421,6 +423,7 @@ impl<'a> SapiHeader {
     }
 }
 
+/// Stores the SAPI request info.
 pub type SapiRequestInfo = sapi_request_info;
 
 impl SapiRequestInfo {

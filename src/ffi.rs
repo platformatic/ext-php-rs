@@ -3,7 +3,7 @@
 #![allow(clippy::all)]
 #![allow(warnings)]
 
-use std::{ffi::c_void, os::raw::c_char};
+use std::ffi::{c_char, c_int, c_void};
 
 pub const ZEND_MM_ALIGNMENT: u32 = 8;
 pub const ZEND_MM_ALIGNMENT_MASK: i32 = -8;
@@ -43,6 +43,27 @@ extern "C" {
     ) -> bool;
 
     pub fn ext_php_rs_zend_bailout() -> !;
+}
+
+// TODO: Gate this with the embed feature
+#[link(name = "wrapper")]
+extern "C" {
+    pub fn ext_php_rs_embed_callback(
+        argc: c_int,
+        argv: *mut *mut c_char,
+        func: unsafe extern "C" fn(*const c_void) -> *const c_void,
+        ctx: *const c_void,
+    ) -> *mut c_void;
+
+    pub fn ext_php_rs_sapi_startup();
+    pub fn ext_php_rs_sapi_shutdown();
+    pub fn ext_php_rs_sapi_per_thread_init();
+    pub fn ext_php_rs_sapi_check_sg();
+    pub fn ext_php_rs_php_error(
+        type_: ::std::os::raw::c_int,
+        error_msg: *const ::std::os::raw::c_char,
+        ...
+    );
 }
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
