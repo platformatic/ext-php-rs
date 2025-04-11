@@ -59,6 +59,11 @@ extern "C" {
     pub fn ext_php_rs_sapi_shutdown();
     pub fn ext_php_rs_sapi_per_thread_init();
     pub fn ext_php_rs_sapi_check_sg();
+    pub fn ext_php_rs_php_error(
+        type_: ::std::os::raw::c_int,
+        error_msg: *const ::std::os::raw::c_char,
+        ...
+    );
 }
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));

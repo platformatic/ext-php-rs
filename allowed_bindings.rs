@@ -319,6 +319,10 @@ bind! {
     php_ini_builder_quoted,
     php_ini_builder_define,
     SAPI_OPTION_NO_CHDIR,
+    php_default_post_reader,
     php_default_treat_data,
-    php_default_input_filter
+    php_default_input_filter,
+    php_register_variable,
+    php_import_environment_variables,
+    zend_error
 }
