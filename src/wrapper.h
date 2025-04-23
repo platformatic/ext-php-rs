@@ -59,4 +59,3 @@ SAPI_API void* ext_php_rs_embed_callback(int argc, char** argv, void* (*callback
 SAPI_API void ext_php_rs_sapi_startup();
 SAPI_API void ext_php_rs_sapi_shutdown();
 SAPI_API void ext_php_rs_sapi_per_thread_init();
-SAPI_API void ext_php_rs_sapi_check_sg();

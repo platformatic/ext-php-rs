@@ -147,20 +147,10 @@ SAPI_API void ext_php_rs_sapi_per_thread_init() {
   #endif
 }
 
-SAPI_API void ext_php_rs_sapi_check_sg() {
-  const char* request_method = SG(request_info).request_method;
-  if (request_method == NULL) {
-    printf("SG(request_info).request_method: NULL\n");
-  } else {
-    printf("SG(request_info).request_method: \"%s\"\n", request_method);
-  }
-}
-
 SAPI_API void ext_php_rs_php_error(int type, const char *format, ...) {
   va_list args;
   va_start(args, format);
   php_error(type, format, args);
-  printf("php_error: ");
   vprintf(format, args);
   va_end(args);
 }

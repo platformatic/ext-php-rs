@@ -24,8 +24,7 @@ pub use crate::ffi::{
     ext_php_rs_embed_callback,
     ext_php_rs_sapi_startup,
     ext_php_rs_sapi_shutdown,
-    ext_php_rs_sapi_per_thread_init,
-    ext_php_rs_sapi_check_sg
+    ext_php_rs_sapi_per_thread_init
 };
 pub use sapi::SapiModule;
 

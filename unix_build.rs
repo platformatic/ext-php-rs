@@ -64,7 +64,8 @@ impl<'a> PHPProvider<'a> for Provider<'a> {
     }
 
     fn print_extra_link_args(&self) -> Result<()> {
-        println!("cargo:rustc-link-lib=php");
+        println!("cargo:rustc-link-search=/usr/local/lib");
+        println!("cargo:rustc-link-lib=dylib=php");
 
         Ok(())
     }
