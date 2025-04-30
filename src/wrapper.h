@@ -25,6 +25,7 @@
 #include "zend_interfaces.h"
 #include "php_variables.h"
 #include "zend_ini.h"
+#include "zend_observer.h"
 #include "main/SAPI.h"
 
 #ifdef ZTS
@@ -59,3 +60,5 @@ SAPI_API void* ext_php_rs_embed_callback(int argc, char** argv, void* (*callback
 SAPI_API void ext_php_rs_sapi_startup();
 SAPI_API void ext_php_rs_sapi_shutdown();
 SAPI_API void ext_php_rs_sapi_per_thread_init();
+
+SAPI_API void ext_php_rs_php_error(int type, const char* format, ...);

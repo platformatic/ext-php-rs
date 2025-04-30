@@ -1,14 +1,15 @@
 //! Types and functions used for throwing exceptions from Rust to PHP.
 
-use std::{ffi::CString, fmt::Debug};
+use std::{ffi::{c_int, c_uint, CString}, fmt::Debug};
 
 use crate::{
     class::RegisteredClass,
     error::{Error, Result},
-    ffi::zend_throw_exception_ex,
-    ffi::zend_throw_exception_object,
+    ffi::{
+        _zend_string, zend_throw_exception_ex, zend_throw_exception_object
+    },
     flags::ClassFlags,
-    types::Zval,
+    types::{ZendStr, Zval},
     zend::{ce, ClassEntry},
 };
 
@@ -215,4 +216,73 @@ pub fn throw_object(zval: Zval) -> Result<()> {
     let mut zv = core::mem::ManuallyDrop::new(zval);
     unsafe { zend_throw_exception_object(core::ptr::addr_of_mut!(zv).cast()) };
     Ok(())
+}
+
+use std::sync::RwLock;
+
+static has_observer: RwLock<bool> = RwLock::new(false);
+static error_observers: RwLock<Vec<Box<
+    dyn Fn(i32, &mut ZendStr, usize, &mut ZendStr) + Send + Sync
+>>> = RwLock::new(Vec::new());
+
+/// Register an error observer.
+///
+/// # Arguments
+///
+/// * `observer` - The error observer to register.
+///
+/// # Example
+///
+/// ```
+/// use ext_php_rs::exception::register_error_observer;
+///
+/// register_error_observer(|error_type, filename, line, message| {
+///     // Handle the error
+/// });
+/// ```
+pub fn register_error_observer<F>(observer: F)
+where
+    F: Fn(i32, &mut ZendStr, usize, &mut ZendStr) + Send + Sync + 'static,
+{
+    {
+        if !*has_observer.read().unwrap() {
+            let mut w = has_observer.write()
+                .expect("should acquire write lock for has_observer");
+            *w = true;
+
+            unsafe {
+                crate::ffi::zend_observer_error_register(Some(error_observer_dispatcher));
+            }
+        }
+    }
+
+    {
+        let mut w = error_observers.write()
+            .expect("should acquire write lock for error_observers");
+        w.push(Box::new(observer));
+    }
+}
+
+#[no_mangle]
+extern "C" fn error_observer_dispatcher(
+    error_type: c_int,
+    filename: *mut ZendStr,
+    line: c_uint,
+    message: *mut ZendStr
+) {
+    let observers = error_observers.read()
+        .expect("should acquire read lock for error_observers");
+
+    if observers.is_empty() {
+        return;
+    }
+
+    let file = unsafe { &mut *filename };
+    let message = unsafe { &mut *message };
+
+    let line = line as usize;
+
+    for observer in observers.iter() {
+        observer(error_type, file, line, message);
+    }
 }

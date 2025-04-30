@@ -118,6 +118,7 @@ bind! {
     zend_string_init_interned,
     zend_throw_exception_ex,
     zend_throw_exception_object,
+    zend_observer_error_register,
     zend_type,
     zend_value,
     zend_wrong_parameters_count_error,
