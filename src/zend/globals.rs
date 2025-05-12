@@ -419,7 +419,7 @@ impl<'a> SapiHeader {
 
     /// Returns the header value.
     pub fn value(&'a self) -> Option<&'a str> {
-        self.as_str().split(':').nth(1).map(|s| s.trim())
+        self.as_str().splitn(2, ':').nth(1).map(|s| s.trim())
     }
 }
 
