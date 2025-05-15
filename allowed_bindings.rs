@@ -309,6 +309,8 @@ bind! {
     _zend_bailout,
     sapi_startup,
     sapi_shutdown,
+    sapi_send_headers,
+    sapi_get_default_content_type,
     php_module_startup,
     php_module_shutdown,
     php_request_startup,

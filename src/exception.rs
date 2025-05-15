@@ -5,9 +5,7 @@ use std::{ffi::{c_int, c_uint, CString}, fmt::Debug};
 use crate::{
     class::RegisteredClass,
     error::{Error, Result},
-    ffi::{
-        _zend_string, zend_throw_exception_ex, zend_throw_exception_object
-    },
+    ffi::{zend_throw_exception_ex, zend_throw_exception_object},
     flags::ClassFlags,
     types::{ZendStr, Zval},
     zend::{ce, ClassEntry},

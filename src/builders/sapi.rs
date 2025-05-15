@@ -5,7 +5,6 @@ use crate::ffi::{
     php_default_post_reader,
     php_default_treat_data,
     php_default_input_filter,
-    zend_error,
     ext_php_rs_php_error
 };
 use crate::types::Zval;
