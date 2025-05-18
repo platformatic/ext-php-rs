@@ -25,6 +25,7 @@ pub use ex::ExecuteData;
 pub use function::Function;
 pub use function::FunctionEntry;
 pub use globals::ExecutorGlobals;
+pub use globals::CompilerGlobals;
 pub use globals::FileGlobals;
 pub use globals::ProcessGlobals;
 pub use globals::SapiGlobals;

@@ -13,7 +13,8 @@ use crate::exception::PhpResult;
 #[cfg(php82)]
 use crate::ffi::zend_atomic_bool_store;
 use crate::ffi::{
-    _sapi_module_struct, _zend_executor_globals, ext_php_rs_executor_globals,
+    _sapi_module_struct, _zend_executor_globals, _zend_compiler_globals,
+    ext_php_rs_executor_globals, ext_php_rs_compiler_globals,
     ext_php_rs_file_globals, ext_php_rs_process_globals, ext_php_rs_sapi_globals,
     ext_php_rs_sapi_module, php_core_globals, php_file_globals, sapi_globals_struct,
     sapi_header_struct, sapi_headers_struct, sapi_request_info, zend_ini_entry,
@@ -180,6 +181,41 @@ impl ExecutorGlobals {
             }
         }
     }
+}
+
+pub type CompilerGlobals = _zend_compiler_globals;
+
+impl CompilerGlobals {
+  /// Returns a reference to the PHP compiler globals.
+  ///
+  /// The compiler globals are guarded by a RwLock. There can be multiple
+  /// immutable references at one time but only ever one mutable reference.
+  /// Attempting to retrieve the globals while already holding the global
+  /// guard will lead to a deadlock. Dropping the globals guard will release
+  /// the lock.
+  pub fn get() -> GlobalReadGuard<Self> {
+      // SAFETY: PHP compiler globals are statically declared therefore should never
+      // return an invalid pointer.
+      let globals = unsafe { ext_php_rs_compiler_globals().as_ref() }
+          .expect("Static compiler globals were invalid");
+      let guard = GLOBALS_LOCK.read();
+      GlobalReadGuard { globals, guard }
+  }
+
+  /// Returns a mutable reference to the PHP compiler globals.
+  ///
+  /// The compiler globals are guarded by a RwLock. There can be multiple
+  /// immutable references at one time but only ever one mutable reference.
+  /// Attempting to retrieve the globals while already holding the global
+  /// guard will lead to a deadlock. Dropping the globals guard will release
+  /// the lock.
+  pub fn get_mut() -> GlobalWriteGuard<Self> {
+      // SAFETY: PHP compiler globals are statically declared therefore should never
+      // return an invalid pointer.
+      let globals = unsafe { &mut *ext_php_rs_compiler_globals() };
+      let guard = SAPI_GLOBALS_LOCK.write();
+      GlobalWriteGuard { globals, guard }
+  }
 }
 
 /// Stores the SAPI module used in the PHP executor.
