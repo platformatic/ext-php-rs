@@ -326,6 +326,7 @@ bind! {
     php_ini_builder_unquoted,
     php_ini_builder_quoted,
     php_ini_builder_define,
+    php_ini_builder_deinit,
     SAPI_OPTION_NO_CHDIR,
     php_default_post_reader,
     php_default_treat_data,
