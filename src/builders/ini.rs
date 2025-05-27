@@ -1,10 +1,10 @@
-use std::ffi::CString;
+use std::ffi::{c_char, CStr, CString};
 use crate::ffi::{
     php_ini_builder,
     php_ini_builder_prepend,
     php_ini_builder_unquoted,
     php_ini_builder_quoted,
-    php_ini_builder_define
+    php_ini_builder_define,
 };
 
 /// A builder for creating INI configurations.
@@ -41,8 +41,9 @@ impl IniBuilder {
     /// ```
     pub fn prepend<V: AsRef<str>>(&mut self, value: V) {
         let value = value.as_ref();
+        let c_value = CString::new(value).unwrap();
         unsafe {
-            php_ini_builder_prepend(self, value.as_ptr() as *mut i8, value.len());
+            php_ini_builder_prepend(self, c_value.into_raw(), value.len());
         }
     }
 
@@ -132,14 +133,11 @@ impl IniBuilder {
     /// let mut builder = IniBuilder::new();
     /// let ini = builder.finish();
     /// ```
-    pub fn finish(&mut self) -> *mut i8 {
-        if !self.value.is_null() {
-            // null-terminate the string
-            unsafe {
-                *self.value.wrapping_add(self.length) = '\0' as i8;
-            }
+    pub fn finish(&mut self) -> *mut c_char {
+        if self.value.is_null() {
+          return std::ptr::null_mut();
         }
 
-        self.value
+        unsafe { CStr::from_ptr(self.value) }.as_ptr() as *mut c_char
     }
 }

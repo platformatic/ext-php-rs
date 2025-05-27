@@ -173,6 +173,7 @@ fn generate_bindings(defines: &[(&str, &str)], includes: &[PathBuf]) -> Result<S
         )
         .clang_args(defines.iter().map(|(var, val)| format!("-D{var}={val}")))
         .formatter(bindgen::Formatter::Rustfmt)
+        .no_copy("php_ini_builder")
         .no_copy("_zval_struct")
         .no_copy("_zend_string")
         .no_copy("_zend_array")
