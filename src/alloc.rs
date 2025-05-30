@@ -1,8 +1,8 @@
 //! Functions relating to the Zend Memory Manager, used to allocate
 //! request-bound memory.
 
-use crate::ffi::{_efree, _emalloc};
-use std::{alloc::Layout, ffi::c_void};
+use crate::{ffi::{_efree, _emalloc, _estrdup}};
+use std::{alloc::Layout, ffi::{c_char, c_void, CString}};
 
 /// Uses the PHP memory allocator to allocate request-bound memory.
 ///
@@ -55,4 +55,10 @@ pub unsafe fn efree(ptr: *mut u8) {
     {
         _efree(ptr as *mut c_void)
     }
+}
+
+#[allow(clippy::missing_safety_doc)]
+pub unsafe fn estrdup(string: impl Into<Vec<u8>>) -> *mut c_char {
+  let string = CString::from_vec_unchecked(string.into());
+  _estrdup(string.into_raw())
 }
