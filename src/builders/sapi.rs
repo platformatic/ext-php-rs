@@ -42,6 +42,7 @@ pub struct SapiBuilder {
     name: String,
     pretty_name: String,
     module: SapiModule,
+    executable_location: Option<String>
 }
 
 impl SapiBuilder {
@@ -94,6 +95,7 @@ impl SapiBuilder {
                 additional_functions: ptr::null(),
                 input_filter_init: None,
             },
+            executable_location: None
         }
     }
 
@@ -305,7 +307,7 @@ impl SapiBuilder {
     ///
     /// * `location` - The location of the executable.
     pub fn executable_location(mut self, location: &str) -> Self {
-        self.module.executable_location = CString::new(location).unwrap().into_raw();
+        self.executable_location = Some(location.to_string());
         self
     }
 
@@ -316,12 +318,24 @@ impl SapiBuilder {
         self.module.name = CString::new(self.name)?.into_raw();
         self.module.pretty_name = CString::new(self.pretty_name)?.into_raw();
 
+        self.module.executable_location = maybe_cstr(self.executable_location)?;
+
         if self.module.send_header.is_none() {
             self.module.send_header = Some(dummy_send_header);
         }
 
         Ok(self.module)
     }
+}
+
+fn maybe_cstr<T>(m: Option<T>) -> Result<*mut c_char>
+where
+  T: Into<Vec<u8>>
+{
+  Ok(match m {
+    None => std::ptr::null_mut(),
+    Some(s) => CString::new(s)?.into_raw()
+  })
 }
 
 /// A function to be called when PHP starts the SAPI
