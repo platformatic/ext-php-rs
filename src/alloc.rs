@@ -59,6 +59,20 @@ pub unsafe fn efree(ptr: *mut u8) {
 
 #[allow(clippy::missing_safety_doc)]
 pub unsafe fn estrdup(string: impl Into<Vec<u8>>) -> *mut c_char {
-  let string = CString::from_vec_unchecked(string.into());
-  _estrdup(string.into_raw())
+    let string = CString::from_vec_unchecked(string.into()).into_raw();
+
+    #[cfg(php_debug)]
+    let result = _estrdup(
+        string,
+        std::ptr::null_mut(),
+        0,
+        std::ptr::null_mut(),
+        0,
+    );
+
+    #[cfg(not(php_debug))]
+    let result = _estrdup(string);
+
+    drop(unsafe { CString::from_raw(string) });
+    result as *mut c_char
 }
