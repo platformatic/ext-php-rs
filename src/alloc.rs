@@ -57,8 +57,38 @@ pub unsafe fn efree(ptr: *mut u8) {
     }
 }
 
-#[allow(clippy::missing_safety_doc)]
-pub unsafe fn estrdup(string: impl Into<Vec<u8>>) -> *mut c_char {
-  let string = CString::from_vec_unchecked(string.into());
-  _estrdup(string.into_raw())
+/// Duplicates a string using the PHP memory manager.
+///
+/// # Parameters
+///
+/// * `string` - The string to duplicate, which can be any type that can be
+///   converted into a `Vec<u8>`.
+///
+/// # Returns
+///
+/// A pointer to the duplicated string in the PHP memory manager.
+pub fn estrdup(string: impl Into<Vec<u8>>) -> *mut c_char {
+    let string = unsafe {
+        CString::from_vec_unchecked(string.into())
+    }.into_raw();
+
+    let result = unsafe {
+        #[cfg(php_debug)]
+        {
+            _estrdup(
+                string,
+                std::ptr::null_mut(),
+                0,
+                std::ptr::null_mut(),
+                0,
+            )
+        }
+        #[cfg(not(php_debug))]
+        {
+            _estrdup(string)
+        }
+    };
+
+    drop(unsafe { CString::from_raw(string) });
+    result
 }
